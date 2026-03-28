@@ -1,72 +1,80 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
+import { Zap, DollarSign, Activity } from 'lucide-react';
+import { Card, Badge } from '@tremor/react';
+
+// Layout Components
+import Sidebar from './components/layout/Sidebar';
+import Header from './components/layout/Header';
+
+// Dashboard Components
+import KPICard from './components/dashboard/KPICard';
+import FeatureTable from './components/dashboard/FeatureTable';
+
+// Data
+import { chartData, featureData } from './data/mockData';
 
 function App() {
-    const [invoices, setInvoices] = useState([]);
-    const [summary, setSummary] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const userName = "Amir Osman";
 
-    useEffect(() => {
-        // Fetch summary and invoices in parallel
-        Promise.all([
-            fetch('http://127.0.0.1:8000/summary').then(res => res.json()),
-            fetch('http://127.0.0.1:8000/invoices').then(res => res.json())
-        ])
-            .then(([summaryData, invoicesData]) => {
-                setSummary(summaryData);
-                setInvoices(invoicesData);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Error fetching data:', err);
-                setError('Failed to fetch data from backend');
-                setLoading(false);
-            });
-    }, []);
+  return (
+    <div className="flex min-h-screen bg-slate-50 font-sans antialiased">
+      <Sidebar />
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+      <main className="flex-1 flex flex-col">
+        <Header userName={userName} />
 
-    return (
-        <div style={{padding: '20px', fontFamily: 'Arial, sans-serif'}}>
-            <h1>Energy Mate Dashboard</h1>
+        {/* Dashboard Area */}
+        <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Good afternoon, {userName}</h1>
+            <p className="text-slate-500">Here's the current state of your energy ecosystem.</p>
+          </div>
 
-            {summary && (
-                <div style={{border: '1px solid #ccc', padding: '15px', borderRadius: '8px', marginBottom: '20px'}}>
-                    <h2>Summary</h2>
-                    <p><strong>Total Consumption:</strong> {summary.total_kwh} kWh</p>
-                    <p><strong>Total Amount:</strong> ${summary.total_amount}</p>
-                    {summary.alerts && (
-                        <div style={{color: 'red', fontWeight: 'bold'}}>
-                            Alert: {summary.alerts}
-                        </div>
-                    )}
-                </div>
-            )}
+          {/* Context Card */}
+          <Card className="bg-indigo-600 border-none shadow-lg shadow-indigo-200/50 p-6 text-white">
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">Campsite Facility Optimization</h3>
+                <p className="text-indigo-100 text-sm max-w-lg">
+                  Your primary facility is currently running 12% above seasonal average. 
+                  View the new cost optimization report for immediate reduction strategies.
+                </p>
+              </div>
+              <Badge color="indigo" className="bg-white/20 text-white border-none">Optimization Ready</Badge>
+            </div>
+          </Card>
 
-            <h2>Recent Invoices</h2>
-            <table border="1" cellPadding="10" style={{borderCollapse: 'collapse', width: '100%'}}>
-                <thead>
-                <tr style={{backgroundColor: '#f4f4f4'}}>
-                    <th>Month</th>
-                    <th>kWh</th>
-                    <th>Amount</th>
-                    <th>Date Created</th>
-                </tr>
-                </thead>
-                <tbody>
-                {invoices.map(invoice => (
-                    <tr key={invoice.id}>
-                        <td>{invoice.month}</td>
-                        <td>{invoice.kwh}</td>
-                        <td>${invoice.amount}</td>
-                        <td>{invoice.created_at}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+          {/* KPI Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <KPICard 
+              title="Total Consumption" 
+              value="1,234.5 kWh" 
+              icon={Zap} 
+              data={chartData} 
+              color="indigo" 
+            />
+            <KPICard 
+              title="Total Cost" 
+              value="$5,678.90" 
+              icon={DollarSign} 
+              data={chartData} 
+              color="emerald" 
+            />
+            <KPICard 
+              title="Avg. Daily Usage" 
+              value="42.1 kWh" 
+              icon={Activity} 
+              data={chartData} 
+              color="amber" 
+            />
+          </div>
+
+          {/* Table Section */}
+          <FeatureTable data={featureData} />
         </div>
-    );
+      </main>
+    </div>
+  );
 }
 
 export default App;
