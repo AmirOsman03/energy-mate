@@ -2,6 +2,7 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+COPY . /app/backend
+ENV PYTHONPATH=/app
 EXPOSE 8000
-CMD ["uvicorn", "web.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "backend.web.main:app", "--host", "0.0.0.0", "--port", "8000"]
