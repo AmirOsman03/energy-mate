@@ -58,7 +58,7 @@ const Header = ({ userName }) => {
 
             {/* Dropdown */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-200 rounded-lg shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-200">
                 <button
                   onClick={() => {
                     setIsModalOpen(true);
