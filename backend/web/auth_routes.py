@@ -48,3 +48,9 @@ def me(access_token: str = Cookie(None)):
         return {"user": user_info}
     except Exception:
         return {"user": None}
+
+
+@router.get("/logout")
+def logout(response: Response):
+    response.delete_cookie(key="access_token")
+    return {"message": "Logged out"}

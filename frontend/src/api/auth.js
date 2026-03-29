@@ -10,3 +10,8 @@ export const getCurrentUser = async () => {
   const res = await axios.get(`${BASE_URL}/auth/me`, { withCredentials: true });
   return res.data.user;
 };
+
+export const logout = async () => {
+  await axios.get(`${BASE_URL}/auth/logout`, { withCredentials: true });
+  window.location.href = "/";
+};
