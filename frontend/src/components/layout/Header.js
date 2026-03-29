@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Search, User, ChevronDown, LogOut, X } from 'lucide-react';
+import { Bell, Search, User, ChevronDown, LogOut, X, Menu } from 'lucide-react';
 import LoginButton from "../ui/LoginButton";
 import { logout } from "../../api/auth";
 
-const Header = ({ userName }) => {
+const Header = ({ userName, onMenuToggle }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -24,17 +24,26 @@ const Header = ({ userName }) => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 relative z-40">
-      <div className="flex items-center gap-3 text-slate-400 max-w-md w-full">
-        <Search size={18} />
-        <input
-          type="text"
-          placeholder="Search metrics, reports..."
-          className="bg-transparent border-none focus:ring-0 text-sm w-full text-slate-600"
-        />
+    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 relative z-40">
+      <div className="flex items-center gap-4 flex-1">
+        <button 
+          onClick={onMenuToggle}
+          className="lg:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900"
+        >
+          <Menu size={24} />
+        </button>
+        
+        <div className="flex items-center gap-3 text-slate-400 max-w-md w-full">
+          <Search size={18} className="shrink-0" />
+          <input
+            type="text"
+            placeholder="Search..."
+            className="bg-transparent border-none focus:ring-0 text-sm w-full text-slate-600 truncate"
+          />
+        </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 lg:gap-6">
         <div className="relative cursor-pointer text-slate-400 hover:text-indigo-600 transition-colors">
           <Bell size={20} />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
@@ -43,13 +52,13 @@ const Header = ({ userName }) => {
         {userName ? (
           <div className="relative" ref={dropdownRef}>
             <div
-              className="flex items-center gap-3 pl-6 border-l border-slate-100 cursor-pointer group"
+              className="flex items-center gap-2 lg:gap-3 pl-4 lg:pl-6 border-l border-slate-100 cursor-pointer group"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
-              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors shrink-0">
                 <User size={18} />
               </div>
-              <span className="text-sm font-semibold text-slate-700">{userName}</span>
+              <span className="hidden sm:inline text-sm font-semibold text-slate-700">{userName}</span>
               <ChevronDown
                 size={16}
                 className={`text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
@@ -73,7 +82,9 @@ const Header = ({ userName }) => {
             )}
           </div>
         ) : (
-          <LoginButton />
+          <div className="pl-4 lg:pl-6 border-l border-slate-100">
+            <LoginButton />
+          </div>
         )}
       </div>
 
