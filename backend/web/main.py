@@ -1,7 +1,9 @@
+from sys import prefix
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.web.routes import router
-
+from backend.web.auth_routes import router as auth_router
 app = FastAPI(title="Energy Mate")
 
 # Enable CORS for React development server
@@ -14,3 +16,4 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(auth_router, prefix="/auth")
