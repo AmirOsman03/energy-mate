@@ -14,8 +14,10 @@ def login():
     params = urlencode({
         "client_id": GOOGLE_CLIENT_ID,
         "response_type": "code",
-        "scope": "openid email profile",
+        "scope": "openid email profile https://www.googleapis.com/auth/gmail.readonly",
         "redirect_uri": GOOGLE_REDIRECT_URI,
+        "access_type": "offline",  # Added to get refresh token
+        "prompt": "consent"        # Force consent to ensure we get a refresh token if needed
     })
 
     return RedirectResponse(
