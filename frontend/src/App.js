@@ -18,6 +18,7 @@ import {getCurrentUser} from "./api/auth";
 function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     getCurrentUser()
@@ -38,15 +39,17 @@ function App() {
     }
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 lg:space-y-8">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Good afternoon, {user?.name || 'Guest'}</h1>
-          <p className="text-slate-500">Here's the current state of your energy ecosystem.</p>
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+            Good afternoon, {user?.name || 'Guest'}
+          </h1>
+          <p className="text-sm lg:text-base text-slate-500">Here's the current state of your energy ecosystem.</p>
         </div>
 
         {/* Context Card */}
-        <Card className="bg-indigo-600 border-none shadow-lg shadow-indigo-200/50 p-6 text-white">
-          <div className="flex justify-between items-start">
+        <Card className="bg-indigo-600 border-none shadow-lg shadow-indigo-200/50 p-4 lg:p-6 text-white">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">Campsite Facility Optimization</h3>
               <p className="text-indigo-100 text-sm max-w-lg">
@@ -54,12 +57,12 @@ function App() {
                 View the new cost optimization report for immediate reduction strategies.
               </p>
             </div>
-            <Badge color="indigo" className="bg-white/20 text-white border-none">Optimization Ready</Badge>
+            <Badge color="indigo" className="bg-white/20 text-white border-none shrink-0">Optimization Ready</Badge>
           </div>
         </Card>
 
         {/* KPI Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           <KPICard
             title="Total Consumption"
             value="1,234.5 kWh"
@@ -84,20 +87,30 @@ function App() {
         </div>
 
         {/* Table Section */}
-        <FeatureTable data={featureData} />
+        <div className="overflow-hidden">
+          <FeatureTable data={featureData} />
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans antialiased">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="flex min-h-screen bg-slate-50 font-sans antialiased overflow-x-hidden">
+      <Sidebar 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <main className="flex-1 flex flex-col">
-        <Header userName={user?.name} />
+      <main className="flex-1 flex flex-col min-w-0">
+        <Header 
+          userName={user?.name} 
+          onMenuToggle={() => setSidebarOpen(true)}
+        />
 
-        {/* Dashboard Area */}
-        <div className="p-8 max-w-7xl mx-auto w-full">
+        {/* Content Area */}
+        <div className="p-4 lg:p-8 max-w-7xl mx-auto w-full">
           {renderContent()}
         </div>
       </main>
