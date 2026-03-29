@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Zap, DollarSign, Activity } from 'lucide-react';
 import { Card, Badge } from '@tremor/react';
 
@@ -12,21 +12,35 @@ import FeatureTable from './components/dashboard/FeatureTable';
 
 // Data
 import { chartData, featureData } from './data/mockData';
+import {getCurrentUser} from "./api/auth";
 
 function App() {
-  const userName = "Amir Osman";
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((data) => {
+        if (data) {
+          setUser(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        setUser(null);
+      });
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans antialiased">
       <Sidebar />
 
       <main className="flex-1 flex flex-col">
-        <Header userName={userName} />
+        <Header userName={user?.name} />
 
         {/* Dashboard Area */}
         <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Good afternoon, {userName}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Good afternoon, {user?.name || 'Guest'}</h1>
             <p className="text-slate-500">Here's the current state of your energy ecosystem.</p>
           </div>
 
@@ -36,7 +50,7 @@ function App() {
               <div className="space-y-1">
                 <h3 className="text-lg font-semibold">Campsite Facility Optimization</h3>
                 <p className="text-indigo-100 text-sm max-w-lg">
-                  Your primary facility is currently running 12% above seasonal average. 
+                  Your primary facility is currently running 12% above seasonal average.
                   View the new cost optimization report for immediate reduction strategies.
                 </p>
               </div>
@@ -46,26 +60,26 @@ function App() {
 
           {/* KPI Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <KPICard 
-              title="Total Consumption" 
-              value="1,234.5 kWh" 
-              icon={Zap} 
-              data={chartData} 
-              color="indigo" 
+            <KPICard
+              title="Total Consumption"
+              value="1,234.5 kWh"
+              icon={Zap}
+              data={chartData}
+              color="indigo"
             />
-            <KPICard 
-              title="Total Cost" 
-              value="$5,678.90" 
-              icon={DollarSign} 
-              data={chartData} 
-              color="emerald" 
+            <KPICard
+              title="Total Cost"
+              value="$5,678.90"
+              icon={DollarSign}
+              data={chartData}
+              color="emerald"
             />
-            <KPICard 
-              title="Avg. Daily Usage" 
-              value="42.1 kWh" 
-              icon={Activity} 
-              data={chartData} 
-              color="amber" 
+            <KPICard
+              title="Avg. Daily Usage"
+              value="42.1 kWh"
+              icon={Activity}
+              data={chartData}
+              color="amber"
             />
           </div>
 
