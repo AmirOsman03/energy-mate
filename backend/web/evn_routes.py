@@ -39,8 +39,15 @@ def get_evn_invoices(
             # Check if invoice already exists
             existing = invoice_service.get_by_gmail_id(inv["id"])
             if not existing:
-                # Clean amount (remove " ден")
-                clean_amount = float(inv["amount"].replace(" ден", "").replace(".", ""))
+                # Clean amount (remove " ден" and parse correctly)
+                amount_str = inv["amount"].replace(" ден", "").strip()
+                # Handle cases where thousands separator might be a dot and decimal a comma
+                # but based on the example 4215.00 is standard
+                try:
+                    clean_amount = float(amount_str)
+                except ValueError:
+                    # Fallback for alternative formats if needed
+                    clean_amount = float(amount_str.replace(",", ".")) if "," in amount_str else 0.0
                 
                 invoice_data = InvoiceCreate(
                     user_id=user_id,
