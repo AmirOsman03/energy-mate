@@ -14,10 +14,11 @@ export default function LoginButton() {
   return (
     <button
       onClick={login}
-      className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+      className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium hover:bg-slate-50 transition-all shadow-sm active:scale-95"
     >
       <GoogleIcon />
-      <span>Sign in with Google</span>
+      <span className="hidden sm:inline text-sm lg:text-base">Sign in with Google</span>
+      <span className="sm:hidden text-sm">Sign in</span>
     </button>
   );
 }

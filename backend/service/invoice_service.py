@@ -8,24 +8,28 @@ class InvoiceService:
         self.repo = repo
 
     def create_invoice(self, invoice_data: InvoiceCreate):
-        # Generate simple ID based on current count
-        invoices = self.repo.get_all_invoices()
-        new_id = len(invoices) + 1
-        
         invoice = Invoice(
-            id=new_id,
+            user_id=invoice_data.user_id,
             month=invoice_data.month,
             kwh=invoice_data.kwh,
-            amount=invoice_data.amount
+            amount=invoice_data.amount,
+            gmail_message_id=invoice_data.gmail_message_id,
+            invoice_number=invoice_data.invoice_number,
+            customer_number=invoice_data.customer_number,
+            due_date=invoice_data.due_date,
+            subject=invoice_data.subject
         )
         return self.repo.add_invoice(invoice)
 
-    def list_invoices(self):
-        return self.repo.get_all_invoices()
+    def list_invoices(self, user_id: str):
+        return self.repo.get_all_invoices(user_id)
 
-    def calculate_summary(self) -> SummaryDTO:
-        invoices = self.repo.get_all_invoices()
-        total_kwh = sum(i.kwh for i in invoices)
+    def calculate_summary(self, user_id: str) -> SummaryDTO:
+        invoices = self.repo.get_all_invoices(user_id)
+        total_kwh = sum(i.kwh for i in invoices if i.kwh is not None)
         total_amount = sum(i.amount for i in invoices)
         alerts = "High consumption!" if total_kwh > 500 else None
         return SummaryDTO(total_kwh=total_kwh, total_amount=total_amount, alerts=alerts)
+    
+    def get_by_gmail_id(self, gmail_id: str):
+        return self.repo.get_invoice_by_gmail_id(gmail_id)

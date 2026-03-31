@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Response, Query, Cookie
+from fastapi import APIRouter, Response, Query, Cookie, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy.orm import Session
 from urllib.parse import urlencode
 
 from backend.config.config import GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, FRONTEND_URL
 from backend.service.auth_service import AuthService
+from backend.infrastructure.database import get_db
 
 router = APIRouter()
-auth_service = AuthService()
+
+def get_auth_service(db: Session = Depends(get_db)):
+    return AuthService(db)
 
 
 @router.get("/login")
@@ -26,8 +30,8 @@ def login():
 
 
 @router.get("/callback")
-def callback(code: str = Query(...)):
-    data = auth_service.handle_google_callback(code)
+def callback(code: str = Query(...), service: AuthService = Depends(get_auth_service)):
+    data = service.handle_google_callback(code)
 
     response = RedirectResponse(url=FRONTEND_URL)
     response.set_cookie(
@@ -41,12 +45,12 @@ def callback(code: str = Query(...)):
 
 
 @router.get("/me")
-def me(access_token: str = Cookie(None)):
+def me(access_token: str = Cookie(None), service: AuthService = Depends(get_auth_service)):
     if not access_token:
         return {"user": None}
 
     try:
-        user_info = auth_service.get_user_info(access_token)
+        user_info = service.get_user_info(access_token)
         return {"user": user_info}
     except Exception:
         return {"user": None}
