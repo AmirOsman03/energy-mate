@@ -14,17 +14,30 @@ import EVNInvoices from './components/dashboard/EVNInvoices';
 // Data
 import { chartData, featureData } from './data/mockData';
 import {getCurrentUser} from "./api/auth";
+import {getSummary} from "./api/invoices";
 
 function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [summary, setSummary] = useState({
+    total_kwh: 0,
+    total_amount: 0,
+    prev_month_kwh: 0,
+    prev_month_amount: 0,
+    avg_daily_usage: 0
+  });
 
   useEffect(() => {
     getCurrentUser()
       .then((data) => {
         if (data) {
           setUser(data);
+          // Fetch summary once user is loaded
+          const userId = data.id || data.sub;
+          getSummary(userId).then(summaryData => {
+            if (summaryData) setSummary(summaryData);
+          });
         }
       })
       .catch((err) => {
@@ -53,8 +66,8 @@ function App() {
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">Campsite Facility Optimization</h3>
               <p className="text-indigo-100 text-sm max-w-lg">
-                Your primary facility is currently running 12% above seasonal average.
-                View the new cost optimization report for immediate reduction strategies.
+                Your primary facility is currently running {summary.alerts ? 'above' : 'within'} seasonal average.
+                {summary.alerts && " " + summary.alerts}
               </p>
             </div>
             <Badge color="indigo" className="bg-white/20 text-white border-none shrink-0">Optimization Ready</Badge>
@@ -64,22 +77,22 @@ function App() {
         {/* KPI Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           <KPICard
-            title="Total Consumption"
-            value="1,234.5 kWh"
+            title="Prev. Month Consumption"
+            value={`${summary.prev_month_kwh?.toLocaleString()} kWh`}
             icon={Zap}
             data={chartData}
             color="indigo"
           />
           <KPICard
-            title="Total Cost"
-            value="$5,678.90"
+            title="Prev. Month Cost"
+            value={`${summary.prev_month_amount?.toLocaleString()} ден`}
             icon={DollarSign}
             data={chartData}
             color="emerald"
           />
           <KPICard
             title="Avg. Daily Usage"
-            value="42.1 kWh"
+            value={`${summary.avg_daily_usage} kWh`}
             icon={Activity}
             data={chartData}
             color="amber"
