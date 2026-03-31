@@ -42,4 +42,7 @@ class InvoiceRead(BaseModel):
 class SummaryDTO(BaseModel):
     total_kwh: float
     total_amount: float
+    prev_month_kwh: Optional[float] = 0.0
+    prev_month_amount: Optional[float] = 0.0
+    avg_daily_usage: Optional[float] = 0.0
     alerts: Optional[str] = None
