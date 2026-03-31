@@ -13,3 +13,8 @@ export const getInvoices = async (userId) => {
   const res = await axios.get(`${BASE_URL}/invoices?user_id=${userId}`, { withCredentials: true });
   return res.data;
 };
+
+export const syncInvoices = async () => {
+  const res = await axios.get(`${BASE_URL}/evn/invoices`, { withCredentials: true });
+  return res.data.invoices;
+};

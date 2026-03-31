@@ -84,7 +84,9 @@ const EVNInvoices = () => {
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
                       <div>
                         <Text className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Amount</Text>
-                        <Badge color="emerald" size="xs" className="font-bold border-none">{item.amount}</Badge>
+                        <Badge color="emerald" size="xs" className="font-bold border-none">
+                          {typeof item.amount === 'number' ? item.amount.toFixed(2) : parseFloat(item.amount).toFixed(2)} ден
+                        </Badge>
                       </div>
                       <div className="text-right">
                         <Text className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Due Date</Text>
@@ -120,7 +122,9 @@ const EVNInvoices = () => {
                           <Text className="text-sm">{item.customer_number}</Text>
                         </TableCell>
                         <TableCell>
-                          <Badge color="emerald" className="text-xs">{item.amount}</Badge>
+                          <Badge color="emerald" className="text-xs">
+                            {(item.amount ? (typeof item.amount === 'number' ? item.amount : parseFloat(item.amount)) : 0).toFixed(2)} ден
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <Text className="text-sm whitespace-nowrap">{item.due_date}</Text>
@@ -148,3 +152,4 @@ const EVNInvoices = () => {
 };
 
 export default EVNInvoices;
+
