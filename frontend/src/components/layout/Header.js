@@ -33,12 +33,12 @@ const Header = ({ userName, onMenuToggle }) => {
           <Menu size={24} />
         </button>
         
-        <div className="flex items-center gap-3 text-slate-400 max-w-md w-full">
-          <Search size={18} className="shrink-0" />
+        <div className="flex items-center gap-2 sm:gap-3 text-slate-400 max-w-[120px] sm:max-w-md w-full">
+          <Search size={16} className="shrink-0 sm:size-[18px]" />
           <input
             type="text"
             placeholder="Search..."
-            className="bg-transparent border-none focus:ring-0 text-sm w-full text-slate-600 truncate"
+            className="bg-transparent border-none focus:ring-0 text-sm w-full text-slate-600 truncate placeholder:text-xs sm:placeholder:text-sm"
           />
         </div>
       </div>
@@ -82,7 +82,7 @@ const Header = ({ userName, onMenuToggle }) => {
             )}
           </div>
         ) : (
-          <div className="pl-4 lg:pl-6 border-l border-slate-100">
+          <div className="pl-2.5 sm:pl-4 lg:pl-6 border-l border-slate-100">
             <LoginButton />
           </div>
         )}
