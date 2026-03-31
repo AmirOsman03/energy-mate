@@ -16,9 +16,12 @@ const KPICard = ({ title, value, icon: Icon, data, color }) => (
       <SparkAreaChart
         data={data}
         categories={['value']}
-        index={'month'}
+        index={'month'} // This must match the key used in App.js
         colors={[color]}
         className="h-full w-full"
+        // --- ANIMATION PROPS ---
+        showAnimation={true}
+        animationDuration={1200} // Shorter than the refresh interval for smoothness
       />
     </div>
   </Card>
