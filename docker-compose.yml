@@ -1,6 +1,25 @@
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: energymate_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: energymate
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d energymate"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
+    container_name: energymate_backend
     ports:
       - "8000:8000"
     volumes:
@@ -8,10 +27,15 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://user:password@db:5432/energymate
     command: uvicorn backend.web.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
+    container_name: energymate_frontend
     ports:
       - "3000:3000"
     volumes:
@@ -21,3 +45,6 @@ services:
       - WDS_SOCKET_PORT=0
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

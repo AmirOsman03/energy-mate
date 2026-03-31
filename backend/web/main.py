@@ -1,9 +1,14 @@
-from sys import prefix
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.web.routes import router
 from backend.web.auth_routes import router as auth_router
 from backend.web.evn_routes import router as evn_router
+from backend.infrastructure.database import engine, Base
+from backend.model.user import User
+from backend.model.invoice import Invoice
+
+# Create the database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Energy Mate")
 
