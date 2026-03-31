@@ -2,6 +2,7 @@
 const colors = require("tailwindcss/colors");
 
 module.exports = {
+  darkMode: "class",
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",
@@ -11,7 +12,7 @@ module.exports = {
     current: "currentColor",
     extend: {
       colors: {
-        // tremor variables
+        // Light mode tremor variables
         tremor: {
           brand: {
             faint: colors.blue[50],
@@ -41,12 +42,44 @@ module.exports = {
             inverted: colors.white,
           },
         },
+        "dark-tremor": {
+          brand: {
+            faint: "#0B1229",
+            muted: colors.blue[950],
+            subtle: colors.blue[800],
+            DEFAULT: colors.blue[500],
+            emphasis: colors.blue[400],
+            inverted: colors.blue[950],
+          },
+          background: {
+            muted: "#131A2B",
+            subtle: colors.slate[800],
+            DEFAULT: colors.slate[900],
+            emphasis: colors.slate[300],
+          },
+          border: {
+            DEFAULT: colors.slate[800],
+          },
+          ring: {
+            DEFAULT: colors.slate[800],
+          },
+          content: {
+            subtle: colors.slate[600],
+            DEFAULT: colors.slate[500],
+            emphasis: colors.slate[200],
+            strong: colors.slate[50],
+            inverted: colors.black,
+          },
+        },
       },
       boxShadow: {
         // light
         "tremor-input": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         "tremor-card": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
         "tremor-dropdown": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "dark-tremor-input": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "dark-tremor-card": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "dark-tremor-dropdown": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
       },
       borderRadius: {
         "tremor-small": "0.375rem",

@@ -23,45 +23,47 @@ function App() {
     avg_daily_usage: 0
   });
 
+  // --- THEME LOGIC ---
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
   // --- ANIMATION LOGIC ---
-  // Initialize with 15 points of dummy data to fill the sparkline
   const [animatedData, setAnimatedData] = useState(
-    Array.from({ length: 15 }, (_, i) => ({ month: i.toString(), value: 30 + Math.random() * 20 }))
+    Array.from({ length: 20 }, (_, i) => ({ month: i.toString(), value: 50 }))
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimatedData((prev) => {
-        const nextData = prev.slice(1); // Remove the oldest point
+        const nextData = prev.slice(1);
         const lastValue = prev[prev.length - 1].value;
-
-        // Generate a new value that fluctuates up or down
-        const newValue = Math.max(10, lastValue + (Math.random() * 10 - 5));
-
-        return [
-          ...nextData,
-          {
-            month: Date.now().toString(), // Unique index for Recharts to slide
-            value: newValue
-          }
-        ];
+        const swing = Math.random() * 50 - 25;
+        let newValue = Math.min(Math.max(lastValue + swing, 10), 90);
+        return [...nextData, { month: Date.now().toString(), value: newValue }];
       });
-    }, 1000);
-
+    }, 800);
     return () => clearInterval(interval);
   }, []);
 
-  const refreshData = (userId) => {
-    if (!userId) return;
-    getSummary(userId).then(data => data && setSummary(data)).catch(console.error);
-    getInvoices(userId).then(data => data && setInvoices(data)).catch(console.error);
-  };
-
+  // --- DATA FETCHING ---
   useEffect(() => {
     getCurrentUser().then((data) => {
       if (data) {
         setUser(data);
-        refreshData(data.id || data.sub);
+        const userId = data.id || data.sub;
+        getSummary(userId).then(setSummary).catch(console.error);
+        getInvoices(userId).then(setInvoices).catch(console.error);
       }
     }).catch(err => console.error(err));
   }, []);
@@ -72,10 +74,12 @@ function App() {
     return (
       <div className="space-y-6 lg:space-y-8">
         <div className="space-y-1">
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
             Good afternoon, {user?.name || 'Guest'}
           </h1>
-          <p className="text-sm lg:text-base text-slate-500">Here's the current state of your energy ecosystem.</p>
+          <p className="text-sm lg:text-base text-slate-500 dark:text-slate-400">
+            Real-time monitoring of your energy ecosystem.
+          </p>
         </div>
 
         <Card className="bg-indigo-600 border-none shadow-lg p-6 text-white">
@@ -91,62 +95,32 @@ function App() {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-          <KPICard
-            title="Prev. Month Consumption"
-            value={`${(summary.prev_month_kwh || 0).toLocaleString()} kWh`}
-            icon={Zap}
-            data={animatedData}
-            color="indigo"
-          />
-          <KPICard
-            title="Prev. Month Cost"
-            value={`${(summary.prev_month_amount || 0).toLocaleString()} ден`}
-            icon={DollarSign}
-            data={animatedData}
-            color="emerald"
-          />
-          <KPICard
-            title="Avg. Daily Usage"
-            value={`${(summary.avg_daily_usage || 0).toFixed(2)} kWh`}
-            icon={Activity}
-            data={animatedData}
-            color="amber"
-          />
-          <KPICard
-            title="Total Consumption"
-            value={`${(summary.total_kwh || 0).toLocaleString()} kWh`}
-            icon={Zap}
-            data={animatedData}
-            color="blue"
-          />
-          <KPICard
-            title="Total Cost"
-            value={`${(summary.total_amount || 0).toLocaleString()} ден`}
-            icon={DollarSign}
-            data={animatedData}
-            color="cyan"
-          />
+          <KPICard title="Prev. Month Consumption" value={`${summary.prev_month_kwh?.toLocaleString()} kWh`} icon={Zap} data={animatedData} color="indigo" />
+          <KPICard title="Prev. Month Cost" value={`${summary.prev_month_amount?.toLocaleString()} ден`} icon={DollarSign} data={animatedData} color="emerald" />
+          <KPICard title="Avg. Daily Usage" value={`${summary.avg_daily_usage?.toFixed(2)} kWh`} icon={Activity} data={animatedData} color="amber" />
+          <KPICard title="Total Consumption" value={`${summary.total_kwh?.toLocaleString()} kWh`} icon={Zap} data={animatedData} color="blue" />
+          <KPICard title="Total Cost" value={`${summary.total_amount?.toLocaleString()} ден`} icon={DollarSign} data={animatedData} color="cyan" />
         </div>
 
-        <Card className="border-slate-200 shadow-sm p-0 overflow-hidden bg-white">
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-slate-900">Recent Invoices</h3>
+        <Card className="border-slate-200 dark:border-slate-800 shadow-sm p-0 overflow-hidden bg-white dark:bg-slate-900">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="font-bold text-slate-900 dark:text-slate-50">Recent Invoices</h3>
           </div>
           <div className="overflow-x-auto">
             <Table>
-              <TableHead className="bg-slate-50/50">
+              <TableHead className="bg-slate-50/50 dark:bg-slate-800/50">
                 <TableRow>
-                  <TableHeaderCell>Invoice #</TableHeaderCell>
-                  <TableHeaderCell>Amount</TableHeaderCell>
-                  <TableHeaderCell>Due Date</TableHeaderCell>
+                  <TableHeaderCell className="dark:text-slate-300">Invoice #</TableHeaderCell>
+                  <TableHeaderCell className="dark:text-slate-300">Amount</TableHeaderCell>
+                  <TableHeaderCell className="dark:text-slate-300">Due Date</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {invoices.slice(0, 5).map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.invoice_number || 'Manual'}</TableCell>
-                    <TableCell>{item.amount.toLocaleString()} ден</TableCell>
-                    <TableCell>{item.due_date || item.created_at}</TableCell>
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">{item.invoice_number || 'Manual'}</TableCell>
+                    <TableCell className="dark:text-slate-400">{item.amount.toLocaleString()} ден</TableCell>
+                    <TableCell className="dark:text-slate-400">{item.due_date || item.created_at}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -158,8 +132,15 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans antialiased overflow-x-hidden">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 font-sans antialiased overflow-x-hidden transition-colors duration-300">
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
       <main className="flex-1 flex flex-col min-w-0">
         <Header userName={user?.name} onMenuToggle={() => setSidebarOpen(true)} />
         <div className="p-4 lg:p-8 max-w-7xl mx-auto w-full">{renderContent()}</div>
