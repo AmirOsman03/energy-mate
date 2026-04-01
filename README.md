@@ -1,60 +1,78 @@
 # EnergyMate - Energy Consumption Dashboard
 
-EnergyMate is a full-stack application designed to track and visualize energy consumption through monthly invoices. It features a FastAPI backend and a React frontend, all orchestrated with Docker.
+EnergyMate is a sophisticated full-stack application designed to track, visualize, and analyze energy consumption. It seamlessly integrates with Gmail to extract invoice data and provides a modern, iPhone-inspired interface for deep energy insights.
 
-## 🚀 Recent Improvements & Features
+## 🚀 Key Features
 
-- **Google OAuth2 Integration:** Implemented a secure authentication flow using Google OAuth2, including a styled "Sign in with Google" button and backend session management.
-- **Full-Stack Orchestration:** Integrated the backend and frontend using `docker-compose` for a seamless one-command setup.
-- **Automated Invoice Management:** Implemented ID generation and data mapping in the service layer.
-- **Seed Data:** Pre-loaded with 5 months of energy data (October to February) for immediate visualization.
-- **Live Dashboard:** React-based dashboard that fetches real-time consumption summaries and alerts (e.g., "High consumption!" alerts for totals over 500 kWh).
-- **CORS Enabled:** Backend configured to securely communicate with the React development server.
+- **User-Centric Data Isolation:** Full multi-user support. Using Google OAuth2, every user has their own secure profile and private energy database powered by PostgreSQL.
+- **Automated Gmail Invoice Parsing:** Integrated with the Gmail API to automatically scan, fetch, and parse EVN invoices. It extracts amounts, invoice numbers, and due dates without manual entry.
+- **iPhone-Inspired Analytics Dashboard:**
+  - **Minimalist UI:** Clean typography, soft shadows, and Apple-style rounded containers.
+  - **KPI Scroll:** Horizontally scrollable cards for quick metric overviews.
+  - **Monthly Cost Trends:** Smooth, curved Area Charts showing spending over the year.
+  - **Seasonal Breakdown:** Bar charts and Pie charts analyzing usage by Winter, Spring, Summer, and Autumn.
+  - **Smart Insights:** Automatic detection of peak billing months and efficiency trends.
+- **Dynamic Real-Time Dashboard:**
+  - **Pulsing Sparklines:** Live-animating charts that bring consumption data to life.
+  - **Instant Metrics:** Real-time calculation of Previous Month Cost, Consumption, and Average Daily Usage.
+- **Unified Dark Mode:** A polished Dark theme that persists via `localStorage`, featuring custom-tuned colors for reduced eye strain.
+- **Robust Backend:** Built with FastAPI and SQLAlchemy, featuring clean separation of concerns (Models, Repositories, Services, Routes).
 
 ## 🛠 Project Structure
 
 ```text
 EnergyMate/
-├── backend/            # FastAPI Backend
-│   ├── data/           # Seed data and data logic
-│   ├── model/          # Pydantic schemas and Dataclasses
-│   ├── repository/     # In-memory data storage
-│   ├── service/        # Business logic and ID generation
-│   └── web/            # API Routes and FastAPI initialization
-├── frontend/           # React Frontend
-│   ├── public/         # HTML template
-│   └── src/            # React components (App.js, index.js)
-├── docker-compose.yml  # Orchestration for both services
-├── Dockerfile          # Backend Docker configuration
-└── requirements.txt    # Python dependencies
+├── backend/                # FastAPI Application
+│   ├── model/              # SQLAlchemy Models (User, Invoice) & Pydantic Schemas
+│   ├── repository/         # Database Access Object (DAO) layer
+│   ├── service/            # Core logic (Gmail parsing, Analytics calculations)
+│   ├── infrastructure/     # Database connections and Google OAuth config
+│   └── web/                # REST API Endpoints
+├── frontend/               # React Application
+│   ├── src/
+│   │   ├── pages/          # Full-page views (Dashboard, Analytics, GmailInvoices)
+│   │   ├── components/     # UI components (KPICard, Sidebar, Header)
+│   │   └── api/            # Centralized Axios API definitions
+│   └── tailwind.config.js  # Theme and Tremor UI customization
+└── docker-compose.yml      # Full-stack container orchestration
 ```
 
 ## 🚦 Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose installed on your machine.
-- Google OAuth2 credentials (Client ID and Client Secret) configured in the backend `.env` file.
+- Docker and Docker Compose.
+- Google Cloud Console Project with **Gmail API** enabled.
+- OAuth2 Client Credentials (Web Application).
 
-### Running the Application
-1. **Build and Start:**
-   ```bash
-   docker-compose up --build -d
-   ```
-2. **Access the Dashboard:**
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-3. **Access API Documentation:**
-   Open [http://localhost:8000/docs](http://localhost:8000/docs) to explore the Swagger UI.
+### Setup & Installation
+1.  **Environment Configuration:**
+    Create `backend/.env` with your credentials:
+    ```env
+    DATABASE_URL=postgresql://user:password@db:5432/energymate
+    GOOGLE_CLIENT_ID=your_id.apps.googleusercontent.com
+    GOOGLE_CLIENT_SECRET=your_secret
+    GOOGLE_REDIRECT_URI=http://localhost:8000/auth/callback
+    FRONTEND_URL=http://localhost:3000
+    ```
+
+2.  **Launch the Stack:**
+    ```bash
+    docker-compose up --build -d
+    ```
+
+3.  **Access EnergyMate:**
+    - Dashboard: [http://localhost:3000](http://localhost:3000)
+    - Swagger Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## 📡 API Endpoints
 
-- `GET /invoices`: List all energy invoices.
-- `POST /invoices`: Add a new invoice (automatically generates IDs).
-- `GET /summary`: Get total kWh, total amount, and consumption alerts.
-- `GET /auth/login`: Initiates the Google OAuth2 flow.
-- `GET /auth/callback`: Handles the OAuth2 callback and sets the session cookie.
-- `GET /auth/me`: Returns the currently authenticated user.
+- `GET /analytics`: Detailed seasonal and monthly trend analysis.
+- `GET /summary`: High-level summary of total usage and alerts.
+- `GET /evn/invoices`: Trigger Gmail sync and data extraction.
+- `GET /invoices`: Retrieve the full invoice history for the authenticated user.
+- `GET /auth/login`: Initiate the secure Google login flow.
 
 ## 💻 Tech Stack
-- **Backend:** Python, FastAPI, Pydantic, Uvicorn.
-- **Frontend:** JavaScript, React, Tailwind CSS.
-- **DevOps:** Docker, Docker Compose.
+- **Backend:** Python 3.11, FastAPI, SQLAlchemy, PostgreSQL.
+- **Frontend:** React 18, Tremor UI, Tailwind CSS, Lucide Icons.
+- **Infrastructure:** Docker, Docker Compose.
