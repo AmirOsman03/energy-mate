@@ -1,6 +1,7 @@
 from datetime import date, timedelta
+import calendar
 from backend.repository.invoice_repo import InvoiceRepository
-from backend.model.schemas import SummaryDTO, InvoiceCreate
+from backend.model.schemas import SummaryDTO, InvoiceCreate, AnalyticsDTO, MonthlyTrend, SeasonalBreakdown
 from backend.model.invoice import Invoice
 
 
@@ -54,5 +55,64 @@ class InvoiceService:
             alerts=alerts
         )
     
+    def calculate_analytics(self, user_id: str) -> AnalyticsDTO:
+        invoices = self.repo.get_all_invoices(user_id)
+        if not invoices:
+            return AnalyticsDTO(
+                monthly_trend=[],
+                seasonal_breakdown=[],
+                total_spent=0,
+                avg_monthly=0,
+                peak_usage_kwh=0,
+                peak_month="N/A"
+            )
+
+        # Monthly Trend
+        monthly_data = {}
+        for i in range(1, 13):
+            monthly_data[i] = 0.0
+        
+        for inv in invoices:
+            month_idx = inv.created_at.month
+            if inv.due_date and "." in inv.due_date:
+                try:
+                    month_idx = int(inv.due_date.split(".")[1])
+                except:
+                    pass
+            monthly_data[month_idx] += inv.amount
+
+        monthly_trend = [
+            MonthlyTrend(month=calendar.month_name[m][:3], cost=round(c, 2))
+            for m, c in sorted(monthly_data.items())
+        ]
+
+        # Seasonal Breakdown
+        seasons = {
+            "Winter": [12, 1, 2],
+            "Spring": [3, 4, 5],
+            "Summer": [6, 7, 8],
+            "Autumn": [9, 10, 11]
+        }
+        seasonal_breakdown = []
+        for name, months in seasons.items():
+            cost = sum(monthly_data[m] for m in months)
+            seasonal_breakdown.append(SeasonalBreakdown(name=name, cost=round(cost, 2)))
+
+        total_spent = sum(i.amount for i in invoices)
+        avg_monthly = total_spent / len(set(inv.created_at.month for inv in invoices)) if invoices else 0
+        
+        peak_inv = max(invoices, key=lambda x: x.kwh or 0)
+        peak_usage_kwh = peak_inv.kwh or 0
+        peak_month = calendar.month_name[peak_inv.created_at.month]
+
+        return AnalyticsDTO(
+            monthly_trend=monthly_trend,
+            seasonal_breakdown=seasonal_breakdown,
+            total_spent=round(total_spent, 2),
+            avg_monthly=round(avg_monthly, 2),
+            peak_usage_kwh=peak_usage_kwh,
+            peak_month=peak_month
+        )
+
     def get_by_gmail_id(self, gmail_id: str):
         return self.repo.get_invoice_by_gmail_id(gmail_id)

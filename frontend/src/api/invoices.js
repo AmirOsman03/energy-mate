@@ -14,6 +14,12 @@ export const getInvoices = async (userId) => {
   return res.data;
 };
 
+export const getAnalytics = async (userId) => {
+  if (!userId) return null;
+  const res = await axios.get(`${BASE_URL}/analytics?user_id=${userId}`, { withCredentials: true });
+  return res.data;
+};
+
 export const syncInvoices = async () => {
   const res = await axios.get(`${BASE_URL}/evn/invoices`, { withCredentials: true });
   return res.data.invoices;

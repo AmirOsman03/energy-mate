@@ -56,7 +56,12 @@ const Sidebar = ({ activeTab, onTabChange, isOpen, onClose, theme, toggleTheme }
             active={activeTab === 'gmail'}
             onClick={() => { onTabChange('gmail'); onClose(); }}
           />
-          <SidebarItem icon={PieChart} label="Analytics" />
+          <SidebarItem
+            icon={PieChart}
+            label="Analytics"
+            active={activeTab === 'analytics'}
+            onClick={() => { onTabChange('analytics'); onClose(); }}
+          />
           <SidebarItem icon={BarChart3} label="Reports" />
           <SidebarItem icon={Bell} label="Alerts" />
         </nav>
