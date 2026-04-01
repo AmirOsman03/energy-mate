@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.service.invoice_service import InvoiceService
 from backend.repository.invoice_repo import InvoiceRepository
-from backend.model.schemas import InvoiceCreate, InvoiceRead, SummaryDTO
+from backend.model.schemas import InvoiceCreate, InvoiceRead, SummaryDTO, AnalyticsDTO
 from backend.infrastructure.database import get_db
 
 router = APIRouter()
@@ -24,3 +24,7 @@ def list_invoices(user_id: str, service: InvoiceService = Depends(get_invoice_se
 @router.get("/summary", response_model=SummaryDTO)
 def summary(user_id: str, service: InvoiceService = Depends(get_invoice_service)):
     return service.calculate_summary(user_id)
+
+@router.get("/analytics", response_model=AnalyticsDTO)
+def analytics(user_id: str, service: InvoiceService = Depends(get_invoice_service)):
+    return service.calculate_analytics(user_id)

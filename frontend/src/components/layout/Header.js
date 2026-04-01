@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Search, User, ChevronDown, LogOut, X, Menu } from 'lucide-react';
+import { Bell, Search, User, ChevronDown, LogOut, Menu } from 'lucide-react';
 import LoginButton from "../ui/LoginButton";
 import { logout } from "../../api/auth";
 

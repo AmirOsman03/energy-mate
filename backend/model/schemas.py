@@ -46,3 +46,19 @@ class SummaryDTO(BaseModel):
     prev_month_amount: Optional[float] = 0.0
     avg_daily_usage: Optional[float] = 0.0
     alerts: Optional[str] = None
+
+class MonthlyTrend(BaseModel):
+    month: str
+    cost: float
+
+class SeasonalBreakdown(BaseModel):
+    name: str
+    cost: float
+
+class AnalyticsDTO(BaseModel):
+    monthly_trend: List[MonthlyTrend]
+    seasonal_breakdown: List[SeasonalBreakdown]
+    total_spent: float
+    avg_monthly: float
+    peak_usage_kwh: float
+    peak_month: str

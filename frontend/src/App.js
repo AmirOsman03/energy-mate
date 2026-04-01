@@ -7,10 +7,11 @@ import Header from './components/layout/Header';
 // Pages
 import Dashboard from './pages/Dashboard';
 import GmailInvoices from './pages/GmailInvoices';
+import Analytics from './pages/Analytics';
 
 // API
 import {getCurrentUser} from "./api/auth";
-import {getSummary, getInvoices} from "./api/invoices";
+import {getSummary, getInvoices, getAnalytics} from "./api/invoices";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,6 +26,7 @@ function App() {
     prev_month_amount: 0,
     avg_daily_usage: 0
   });
+  const [analyticsData, setAnalyticsData] = useState(null);
 
   useEffect(() => {
     // Apply theme to document
@@ -50,6 +52,10 @@ function App() {
     getInvoices(userId).then(invoiceData => {
       if (invoiceData) setInvoices(invoiceData);
     }).catch(err => console.error("Invoices fetch error:", err));
+
+    getAnalytics(userId).then(data => {
+      if (data) setAnalyticsData(data);
+    }).catch(err => console.error("Analytics fetch error:", err));
   };
 
   useEffect(() => {
@@ -67,9 +73,25 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      const userId = user.id || user.sub;
+      refreshData(userId);
+    }
+  }, [activeTab]);
+
   const renderContent = () => {
     if (activeTab === 'gmail') {
       return <GmailInvoices />;
+    }
+
+    if (activeTab === 'analytics') {
+      return (
+        <Analytics 
+          data={analyticsData} 
+          onRefresh={() => user && refreshData(user.id || user.sub)} 
+        />
+      );
     }
 
     return (
